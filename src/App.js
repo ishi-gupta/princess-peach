@@ -77,54 +77,45 @@ const App = () => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      {/* Always render the background without clouds */}
-      <StartScreen onStartGame={goToGame} showUI={false} clouds={[]} />
-      
-      {/* Overlay the UI only when on start screen */}
+      {/* Start Screen */}
       {currentScreen === 'start' && (
-        <div style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%', 
-          zIndex: 20,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <StartScreen onStartGame={goToGame} showUI={true} clouds={[]} />
-        </div>
+        <StartScreen onStartGame={goToGame} showUI={true} clouds={[]} />
       )}
       
-      {/* Show clouds only during gameplay */}
+      {/* Game Screen - scrollable with its own background */}
       {currentScreen === 'game' && (
-        <div style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%', 
-          zIndex: 3,
-          pointerEvents: 'none'
-        }}>
-          {clouds.map(cloud => (
-            <img 
-              key={cloud.id}
-              src={cloud.src}
-              alt="Cloud"
-              style={{
-                position: 'absolute',
-                left: '-100px',
-                top: `${cloud.top}px`,
-                width: `${cloud.size}px`,
-                height: 'auto',
-                zIndex: 3,
-                animation: `floatCloud ${cloud.duration}s linear infinite`,
-                animationDelay: `${cloud.delay}s`
-              }}
-            />
-          ))}
+        <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+          {/* GameScreen handles its own background and scrolling */}
+          <GameScreen />
+          
+          {/* Floating clouds overlay */}
+          <div style={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            zIndex: 15,
+            pointerEvents: 'none'
+          }}>
+            {clouds.map(cloud => (
+              <img 
+                key={cloud.id}
+                src={cloud.src}
+                alt="Cloud"
+                style={{
+                  position: 'absolute',
+                  left: '-100px',
+                  top: `${cloud.top}px`,
+                  width: `${cloud.size}px`,
+                  height: 'auto',
+                  zIndex: 15,
+                  animation: `floatCloud ${cloud.duration}s linear infinite`,
+                  animationDelay: `${cloud.delay}s`
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
