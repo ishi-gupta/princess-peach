@@ -40,6 +40,14 @@ const BackgroundEffects = ({ clouds = [] }) => {
       animation: 'sway 3s ease-in-out infinite',
       filter: 'drop-shadow(0 0 8px rgba(255, 0, 0, 0.6))'
     },
+    grassFloor: {
+      position: 'absolute',
+      bottom: '0',
+      left: '0',
+      width: '100%',
+      height: 'auto',
+      zIndex: 8
+    },
     cloud: {
       position: 'absolute',
       left: '-100px',
@@ -91,6 +99,13 @@ const BackgroundEffects = ({ clouds = [] }) => {
         src="/assets/sprites/cherryblossom-sky.png" 
         alt="Cherry Blossoms Top" 
         style={styles.cherryBlossomsTop}
+      />
+      
+      {/* Grass floor at the bottom */}
+      <img 
+        src="/backgrounds/grass-floor.png" 
+        alt="Grass Floor" 
+        style={styles.grassFloor}
       />
     </>
   );

@@ -7,6 +7,26 @@ const App = () => {
   const [clouds, setClouds] = useState([]);
   const cloudIntervalRef = useRef(null);
 
+  // Add CSS animations for clouds
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes floatCloud {
+        0% {
+          transform: translateX(-100px);
+        }
+        100% {
+          transform: translateX(calc(100vw + 100px));
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   // Generate a random cloud
   const generateCloud = () => {
     const cloudTypes = ['/assets/sprites/cloud.png', '/assets/sprites/different-cloud.png'];

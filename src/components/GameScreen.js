@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 const GameScreen = () => {
-  const [marioPosition, setMarioPosition] = useState({ x: 100, y: 300 });
+  const [marioPosition, setMarioPosition] = useState({ x: 100, y: 400 }); // Adjusted to stand on grass
   const [marioVelocity, setMarioVelocity] = useState({ x: 0, y: 0 });
   const [isJumping, setIsJumping] = useState(false);
   const [screenOffset, setScreenOffset] = useState(0);
   const [keys, setKeys] = useState({});
 
   const GRAVITY = 0.8;
-  const JUMP_FORCE = -15;
+  const JUMP_FORCE = -25; // Increased from -15 to -25 for higher jumps
   const MOVE_SPEED = 5;
-  const GROUND_Y = 300;
+  const GROUND_Y = 500; // Adjusted to match grass floor position
+  const SCREEN_MULTIPLIER = 5; // Number of screens worth of content
+  const SCREEN_WIDTH = 1000; // Width of one screen in pixels
 
   // Handle key presses
   const handleKeyDown = useCallback((e) => {
@@ -39,7 +41,7 @@ const GameScreen = () => {
         let newX = prev.x;
         let newY = prev.y;
         let newVelocityX = 0;
-        let newVelocityY = prev.y;
+        let newVelocityY = marioVelocity.y; // Use the current velocity
 
         // Handle horizontal movement
         if (keys['ArrowLeft'] || keys['KeyA']) {
@@ -69,15 +71,17 @@ const GameScreen = () => {
           setIsJumping(false);
         }
 
-        // Update screen offset for endless scrolling
-        if (newX > 400) {
-          setScreenOffset(prev => prev + (newX - 400));
-          newX = 400;
-        } else if (newX < 100) {
-          setScreenOffset(prev => prev + (newX - 100));
-          newX = 100;
+        // Update screen offset for smooth scrolling
+        const centerX = window.innerWidth / 2;
+        if (newX > centerX + 100) {
+          setScreenOffset(prev => prev + (newX - (centerX + 100)));
+          newX = centerX + 100;
+        } else if (newX < centerX - 100) {
+          setScreenOffset(prev => prev + (newX - (centerX - 100)));
+          newX = centerX - 100;
         }
 
+        // Update velocity state
         setMarioVelocity({ x: newVelocityX, y: newVelocityY });
         return { x: newX, y: newY };
       });
@@ -85,7 +89,7 @@ const GameScreen = () => {
 
     const interval = setInterval(gameLoop, 16); // ~60 FPS
     return () => clearInterval(interval);
-  }, [keys, isJumping]);
+  }, [keys, isJumping, marioVelocity.y]);
 
   const styles = {
     container: {
@@ -95,7 +99,7 @@ const GameScreen = () => {
       position: 'relative'
     },
     scrollableContent: {
-      width: '100vw',
+      width: `${SCREEN_WIDTH * SCREEN_MULTIPLIER}px`,
       height: '100vh',
       backgroundImage: 'url(/backgrounds/tileable-background-skyline.png)',
       backgroundSize: 'auto 100%',
@@ -141,11 +145,19 @@ const GameScreen = () => {
       animation: 'sway 3s ease-in-out infinite',
       filter: 'drop-shadow(0 0 8px rgba(255, 0, 0, 0.6))'
     },
+    grassFloor: {
+      position: 'absolute',
+      bottom: '0',
+      left: '0',
+      width: '100%',
+      height: 'auto',
+      zIndex: 8
+    },
     mario: {
       position: 'absolute',
       left: `${marioPosition.x}px`,
-      bottom: `${marioPosition.y}px`,
-      width: '60px',
+      top: `${marioPosition.y}px`,
+      width: '100px',
       height: 'auto',
       zIndex: 20,
       transform: marioVelocity.x < 0 ? 'scaleX(-1)' : 'scaleX(1)',
@@ -196,6 +208,11 @@ const GameScreen = () => {
           alt="Mario" 
           style={styles.mario}
         />
+        <img 
+          src="/backgrounds/grass-floor.png" 
+          alt="Grass Floor" 
+          style={styles.grassFloor}
+        />
       </div>
       
       {/* Instructions */}
@@ -203,6 +220,7 @@ const GameScreen = () => {
         <div>Arrow Keys: Move</div>
         <div>Space/Up: Jump</div>
         <div>Screen Offset: {Math.round(screenOffset)}px</div>
+        <div>Screens: {SCREEN_MULTIPLIER}</div>
       </div>
     </div>
   );
